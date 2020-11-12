@@ -207,12 +207,14 @@
         alps-fill-in        (translate [0 0 (/ plate-thickness 2)] (cube alps-width alps-height plate-thickness))
         mx-fill-in          (translate [0 0 (/ plate-thickness 2)] (cube keyswitch-width keyswitch-height plate-thickness))
         fill-in             (if use-alps? alps-fill-in mx-fill-in)
+        kailh-nub-hole      (->> (cube 5 16 2))
+                                ;  (translate [0 (/ (+ keyswitch-height 3) 4) -2.5]))
         top-wall            (if use-alps?
                               (->> (cube (+ keyswitch-width 3) 2.7 plate-thickness)
                                    (translate [0
                                                (+ (/ 2.7 2) (/ alps-height 2))
                                                (/ plate-thickness 2)]))
-                              (->> (cube (+ keyswitch-width 3) 2 plate-thickness)
+                              (->> (difference (cube (+ keyswitch-width 3) 2 plate-thickness) kailh-nub-hole)
                                    (translate [0
                                                (+ (/ 2 2) (/ keyswitch-height 2))
                                                (/ plate-thickness 2)])))
@@ -242,37 +244,45 @@
                                    left-wall
                                    (if create-side-nub? (with-fn 100 side-nub) ()))
         ; the bottom of the hole.
-        swap-holder         (->> (cube (+ keyswitch-width 3) (/ (+ keyswitch-height 3) 2) 3)
-                                 (translate [0 (/ (+ keyswitch-height 3) 4) -1.5]))
+        swap-holder         (->> (cube (+ keyswitch-width 3) (/ (+ keyswitch-height 3) 2) 5)
+                                 (translate [0 (/ (+ keyswitch-height 3) 4) -2.5]))
         ; for the main axis
         main-axis-hole      (->> (cylinder (/ 4.0 2) 10)
                                  (with-fn 12))
-        plus-hole           (->> (cylinder (/ 3.3 2) 10)
+        plus-hole           (->> (cylinder (/ 3.4 2) 5)
                                  (with-fn 8)
                                  (translate [-3.81 2.54 0]))
-        minus-hole          (->> (cylinder (/ 3.3 2) 10)
+        minus-hole          (->> (cylinder (/ 3.4 2) 5)
                                  (with-fn 8)
                                  (translate [2.54 5.08 0]))
-        plus-hole-mirrored  (->> (cylinder (/ 3.3 2) 10)
+        plus-hole-mirrored  (->> (cylinder (/ 3.4 2) 5)
                                  (with-fn 8)
                                  (translate [3.81 2.54 0]))
-        minus-hole-mirrored (->> (cylinder (/ 3.3 2) 10)
+        minus-hole-mirrored (->> (cylinder (/ 3.4 2) 5)
                                  (with-fn 8)
                                  (translate [-2.54 5.08 0]))
         friction-hole       (->> (cylinder (/ 1.7 2) 10)
                                  (with-fn 8))
         friction-hole-right (translate [5 0 0] friction-hole)
         friction-hole-left  (translate [-5 0 0] friction-hole)
-        hotswap-base-shape  (->> (cube 19 6.2 3.5)
-                                 (translate [0 4 -2.6]))
+        hotswap-base-shape  (->> (cube 19 6.2 2.5)
+                                 (translate [0 4 -2.1]))
+        hotswap-ledge-cutout (->> (cube 19 6.2 3.5)
+        ; change y translate to move overhang tab in or out
+                                 (translate [0 1.5 -4.6]))
+        hotswap-ledge-cutout-side1 (->> (cube 6 6.2 3.5)
+                                 (translate [7.5 4 -4.6]))
+        hotswap-ledge-cutout-side2 (->> (cube 6 6.2 3.5)
+                                 (translate [-7.5 4 -4.6]))
         hotswap-holder      (difference swap-holder
-                                        main-axis-hole
+                                      main-axis-hole
                                         plus-hole
                                         minus-hole
-                                        plus-hole-mirrored
-                                        minus-hole-mirrored
-                                        friction-hole-left
-                                        friction-hole-right
+                                        ; plus-hole-mirrored
+                                        ; minus-hole-mirrored
+                                        hotswap-ledge-cutout
+                                        hotswap-ledge-cutout-side1
+                                        hotswap-ledge-cutout-side2
                                         hotswap-base-shape)]
     (difference (union plate-half
                        (->> plate-half
@@ -415,9 +425,9 @@
   (union (cylinder [bottom-radius top-radius] height)
          (translate [0 0 (/ height 2)] (sphere top-radius))))
 
-(def screw-insert-height 3.8)
-(def screw-insert-bottom-radius (/ 5.31 2))
-(def screw-insert-top-radius (/ 5.1 2))
+(def screw-insert-height 7.8)
+(def screw-insert-bottom-radius (/ 5.5 2))
+(def screw-insert-top-radius (/ 5.5 2))
 
 (defn screw-insert-holes
   "TODO: doc.

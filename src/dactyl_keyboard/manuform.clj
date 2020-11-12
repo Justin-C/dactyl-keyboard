@@ -1131,28 +1131,8 @@
   (map + (trrs-usb-holder-position c) [-13.6 0 0]))
 (def trrs-holder-thickness 2)
 (def trrs-holder-thickness-2x (* 2 trrs-holder-thickness))
-(defn trrs-holder [c]
-  (union
-   (->> (cube (+ (first trrs-holder-size) trrs-holder-thickness-2x)
-              (+ trrs-holder-thickness (second trrs-holder-size))
-              (+ (last trrs-holder-size) trrs-holder-thickness))
-        (translate [(first (trrs-holder-position c))
-                    (second (trrs-holder-position c))
-                    (/ (+ (last trrs-holder-size) trrs-holder-thickness) 2)]))))
-(defn trrs-holder-hole [c]
-  (union
-   (->>
-    (->> (binding [*fn* 30] (cylinder 2.55 20))) ; 5mm trrs jack
-    (rotate (deg2rad  90) [1 0 0])
-    (translate [(first (trrs-holder-position c))
-                (+ (second (trrs-holder-position c))
-                   (/ (+ (second trrs-holder-size) trrs-holder-thickness) 2))
-                (+ 3 (/ (+ (last trrs-holder-size) trrs-holder-thickness) 2))])) ;1.5 padding
-  ; rectangular trrs holder
-   (->> (apply cube trrs-holder-hole-size)
-        (translate [(first (trrs-holder-position c))
-                    (+ (/ trrs-holder-thickness -2) (second (trrs-holder-position c)))
-                    (+ (/ (last trrs-holder-hole-size) 2) trrs-holder-thickness)]))))
+(defn trrs-holder [c])
+(defn trrs-holder-hole [c])
 
 (defn pro-micro-position [c]
   (map + (key-position c 0 0.15 (wall-locate3 -1 0)) [-2 2 -30]))
@@ -1199,24 +1179,7 @@
 (defn teensy-holder-top-offset [c]
   (- (/ teensy-holder-top-length 2) (teensy-holder-length c)))
 
-(defn teensy-holder [c]
-  (->>
-   (union
-    (->> (cube 3 (teensy-holder-length c) (+ 6 teensy-width))
-         (translate [1.5 (teensy-holder-offset c) 0]))
-    (->> (cube teensy-pcb-thickness (teensy-holder-length c) 3)
-         (translate [(+ (/ teensy-pcb-thickness 2) 3) (teensy-holder-offset c) (- -1.5 (/ teensy-width 2))]))
-    (->> (cube 4 (teensy-holder-length c) 4)
-         (translate [(+ teensy-pcb-thickness 5) (teensy-holder-offset c) (-  -1 (/ teensy-width 2))]))
-    (->> (cube teensy-pcb-thickness teensy-holder-top-length 3)
-         (translate [(+ (/ teensy-pcb-thickness 2) 3) (teensy-holder-top-offset c) (+ 1.5 (/ teensy-width 2))]))
-    (->> (cube 4 teensy-holder-top-length 4)
-         (translate [(+ teensy-pcb-thickness 5) (teensy-holder-top-offset c) (+ 1 (/ teensy-width 2))])))
-   (translate [(- teensy-holder-width) 0 0])
-   (translate [-1.4 0 0])
-   (translate [(first (teensy-top-xy c))
-               (- (second (teensy-top-xy c)) 1)
-               (/ (+ 6 teensy-width) 2)])))
+(defn teensy-holder [c])
 
 ; Offsets for the controller/trrs external holder cutout
 (defn external-holder-offset [c]
@@ -1331,24 +1294,10 @@
       (difference
        (union (case-walls c)
               (if use-screw-inserts? (screw-insert-outers screw-placement c) ())
-              (if-not use-external-holder?
-                (union
-                 (if use-promicro-usb-hole?
-                   (union (pro-micro-holder c)
-                          (trrs-usb-holder-holder c))
-                   (union (usb-holder fusb-holder-position c)
-                          (pro-micro-holder c)))
-                 (if use-trrs? (trrs-holder c) ()))
-                ()))
+              ; jrc removed promicro holder bracket 
+)
        (if use-screw-inserts? (screw-insert-holes screw-placement c) ())
-       (if-not use-external-holder?
-         (union
-          (if use-trrs? (trrs-holder-hole c) (rj9-space frj9-start c))
-          (if use-promicro-usb-hole?
-            (union (trrs-usb-holder-space c)
-                   (trrs-usb-jack c))
-            (usb-holder-hole fusb-holder-position c)))
-         (external-holder-space c))))
+))
      (translate [0 0 -60] (cube 350 350 120)))))
 
 (defn model-left [c]
